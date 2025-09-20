@@ -1,44 +1,39 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import React, { useState } from "react";
 import {
+  Box,
+  Button,
+  Divider,
   Paper,
   TextField,
-  Button,
   Typography,
-  Box,
-  Divider,
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
-export default function Login() {
-  const [form, setForm] = useState({ email: "", password: "" });
+export default function ForgetPassword() {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    document.title = "Login - My Shopping List";
-  }, []);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setMessage("");
+
+    if (!email.trim()) {
+      setError("Please enter your email.");
+      return;
+    }
 
     try {
-      const res = await axios.post("http://localhost:3005/login", form);
-      console.log(res.data);
-      localStorage.setItem("token", res.data.token);
-      navigate("/home", {
-        state: { message: "Login successful!" },
+      const res = await axios.post("http://localhost:3005/forget-password", {
+        email,
       });
+      setMessage(res.data.message || "Password reset link sent to your email.");
     } catch (err) {
       console.error(err);
-      setError("Invalid email or password. Please try again.");
+      setError("Error sending reset link. Please try again.");
     }
   };
 
@@ -66,59 +61,34 @@ export default function Login() {
           <ShoppingCartIcon sx={{ fontSize: 50, color: "#006241" }} />
           <Typography
             variant="h5"
-            sx={{ fontWeight: "bold", color: "#006241", mt: 1 }}
+            sx={{ fontWeight: "bold", color: "#006241", mt: 1,  mb:2}}
           >
             My Shopping List
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            Welcome back! Please login
+            Enter your email to reset your password
           </Typography>
         </Box>
 
         <Divider sx={{ mb: 3 }} />
-
-        {location.state?.message && (
-          <Typography color="#006241" align="center" sx={{ mb: 2 }}>
-            {location.state.message}
-          </Typography>
-        )}
 
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
             fullWidth
             margin="normal"
             label="Email Address"
-            name="email"
             type="email"
-            value={form.email}
-            onChange={handleChange}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Password"
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-          <Typography variant="body2" align="right" sx={{}}>
-            <Button
-              component={Link}
-              to="/forget-password"
-              variant="text"
-              sx={{
-                color: "#006241",
-                fontWeight: "bold",
-                textTransform: "none",
-                ":hover": { color: "#008080" },
-              }}
-            >
-              Forget Password?
-            </Button>
-          </Typography>
+
+          {message && (
+            <Typography color="success.main" sx={{ mt: 1 }}>
+              {message}
+            </Typography>
+          )}
+
           {error && (
             <Typography color="error" sx={{ mt: 1 }}>
               {error}
@@ -132,7 +102,7 @@ export default function Login() {
             sx={{
               mt: 3,
               py: 1.2,
-              background: "linear-gradient(135deg, #006241)",
+               background: "linear-gradient(135deg, #006241)",
               fontWeight: "bold",
               fontSize: "1rem",
               textTransform: "none",
@@ -141,7 +111,7 @@ export default function Login() {
               },
             }}
           >
-            Login
+            Send Reset Link
           </Button>
         </Box>
 
@@ -150,18 +120,14 @@ export default function Login() {
           align="center"
           sx={{ mt: 2, color: "text.secondary" }}
         >
-          Don’t have an account?{" "}
+          Remember your password?{" "}
           <Button
             component={Link}
-            to="/register"
+            to="/login"
             variant="text"
-            sx={{
-              color: "#006241",
-              fontWeight: "bold",
-              ":hover": { color: "#008080" },
-            }}
+            sx={{ color: "#006241", fontWeight: "bold", ":hover": { color: "#008080" } }}
           >
-            Register
+            Login
           </Button>
         </Typography>
       </Paper>

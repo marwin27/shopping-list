@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import {
@@ -17,7 +17,7 @@ export default function Register() {
     password: "",
     confirmPassword: "",
   });
-
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,20 +30,21 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (form.password !== form.confirmPassword) {
-      alert("Passwords do not match!");
+      setError("Passwords do not match!");
       return;
     }
     try {
-      const res = await axios.post("http://localhost:3005/register", form); 
+      const res = await axios.post("http://localhost:3005/register", form);
       console.log(res.data);
-      navigate("/", {
+      navigate("/login", {
         state: { message: "Registration successful! Please log in." },
       });
     } catch (error) {
       console.error(error);
-      alert("Error registering user");
+      setError("User Already Exists");
     }
   };
   return (
@@ -54,6 +55,7 @@ export default function Register() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        background: " linear-gradient(135deg, #006241 0%, #008080 100%)",
       }}
     >
       <Paper
@@ -67,12 +69,12 @@ export default function Register() {
         }}
       >
         <Box sx={{ textAlign: "center", mb: 2 }}>
-          <ShoppingCartIcon sx={{ fontSize: 50, color: "success.main" }} />
+          <ShoppingCartIcon sx={{ fontSize: 50, color: "#006241" }} />
           <Typography
             variant="h5"
             sx={{
               fontWeight: "bold",
-              color: "success.main",
+              color: "#006241",
               mt: 1,
             }}
           >
@@ -92,6 +94,7 @@ export default function Register() {
             type="email"
             value={form.email}
             onChange={handleChange}
+            required
           />
           <TextField
             fullWidth
@@ -101,6 +104,7 @@ export default function Register() {
             type="name"
             value={form.name}
             onChange={handleChange}
+            required
           />
           <TextField
             fullWidth
@@ -110,6 +114,7 @@ export default function Register() {
             name="password"
             value={form.password}
             onChange={handleChange}
+            required
           />
           <TextField
             fullWidth
@@ -119,7 +124,14 @@ export default function Register() {
             name="confirmPassword"
             value={form.confirmPassword}
             onChange={handleChange}
+            required
           />
+          {error && (
+            <Typography color="error" sx={{ mt: 1 }}>
+              {error}
+            </Typography>
+          )}
+
           <Button
             type="submit"
             variant="contained"
@@ -127,12 +139,12 @@ export default function Register() {
             sx={{
               mt: 3,
               py: 1.2,
-              background: "linear-gradient(135deg, #10B981, #059669)",
+              background: "linear-gradient(135deg, #006241)",
               fontWeight: "bold",
               fontSize: "1rem",
               textTransform: "none",
               "&:hover": {
-                background: "linear-gradient(135deg, #059669, #047857)",
+                background: "linear-gradient(135deg, #008080, #006241)",
               },
             }}
           >
@@ -148,7 +160,11 @@ export default function Register() {
               component={Link}
               to="/"
               variant="text"
-              sx={{ color: "success.main", fontWeight: "bold" }}
+              sx={{
+                color: "#006241",
+                fontWeight: "bold",
+                ":hover": { color: "#008080" },
+              }}
             >
               Login
             </Button>

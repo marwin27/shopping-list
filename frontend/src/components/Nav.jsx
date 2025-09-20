@@ -12,6 +12,7 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import { useNavigate } from "react-router-dom";
 
 const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -19,6 +20,15 @@ const settings = ["Profile", "Account", "Dashboard", "Logout"];
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const navigate = useNavigate();
+  
+
+
+  const Logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -36,7 +46,12 @@ function ResponsiveAppBar() {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar
+      position="static"
+      sx={{
+        background: "linear-gradient(135deg, #006241 0%, #008080 100%)",
+      }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
@@ -145,7 +160,16 @@ function ResponsiveAppBar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem
+                  key={setting}
+                  onClick={() => {
+                    if (setting === "Logout") {
+                      Logout();
+                    } else {
+                      handleCloseUserMenu();
+                    }
+                  }}
+                >
                   <Typography sx={{ textAlign: "center" }}>
                     {setting}
                   </Typography>
